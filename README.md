@@ -38,4 +38,8 @@ python3 evaluate_hf.py \
 ```
 
 ## The example google colab code
-- tmmluplus: [Google Colab - tmmluplus](https://colab.research.google.com/github/LiuYuWei/llm_evaluation_tmmluplus/blob/main/llm_evaluation_tmmluplus_example.ipynb)
+- mmlu dataset:
+[Google Colab - mmlu](https://colab.research.google.com/github/LiuYuWei/llm_model_evaluation/blob/main/llm_evaluation_mmlu.ipynb)
+
+- tmmluplus dataset: 
+[Google Colab - tmmluplus](https://colab.research.google.com/github/LiuYuWei/llm_model_evaluation/blob/main/llm_evaluation_tmmluplus_example.ipynb)
