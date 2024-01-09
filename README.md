@@ -30,3 +30,6 @@ python3 evaluate_hf.py \
     --data_dir ./llm_evaluation_tmmluplus/data_arrange/ \
     --save_dir ./llm_evaluation_tmmluplus/results/
 ```
+
+## The example google colab code
+Link: [Google Colab](https://colab.research.google.com/github/LiuYuWei/llm_evaluation_tmmluplus/blob/main/llm_evaluation_tmmluplus_example.ipynb)
