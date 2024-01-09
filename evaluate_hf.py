@@ -15,30 +15,55 @@ choices = ["A", "B", "C", "D"]
 
 
 def format_subject(subject):
-    l = subject.split("_")
-    s = ""
-    for entry in l:
-        s += " " + entry
-    return s
+    """
+    Formats the subject string by replacing underscores with spaces.
+
+    Args:
+    subject (str): The subject string to format.
+
+    Returns:
+    str: The formatted subject string.
+    """
+    return " ".join(subject.split("_"))
 
 
 def format_example(df, idx, include_answer=True):
+    """
+    Formats a question example from a dataframe.
+
+    Args:
+    df (pd.DataFrame): The dataframe containing the questions.
+    idx (int): The index of the question in the dataframe.
+    include_answer (bool): Whether to include the answer in the formatted string.
+
+    Returns:
+    str: The formatted question string.
+    """
     prompt = df.iloc[idx, 0]
-    k = df.shape[1] - 2
-    for j in range(k):
+    num_options = df.shape[1] - 2
+    for j in range(num_options):
         prompt += "\n{}. {}".format(choices[j], df.iloc[idx, j + 1])
     prompt += "\nAnswer:"
     if include_answer:
-        prompt += " {}\n\n".format(df.iloc[idx, k + 1])
+        prompt += " {}\n\n".format(df.iloc[idx, num_options + 1])
     return prompt
 
 
 def gen_prompt(train_df, subject, k=-1):
-    prompt = "The following are multiple choice questions (with answers) about {}.\n\n".format(
-        format_subject(subject)
-    )
+    """
+    Generates a prompt with multiple choice questions.
+
+    Args:
+    train_df (pd.DataFrame): The dataframe containing training data.
+    subject (str): The subject of the questions.
+    k (int): The number of questions to include in the prompt.
+
+    Returns:
+    str: The generated prompt.
+    """
     if k == -1:
         k = train_df.shape[0]
+    prompt = "The following are multiple choice questions (with answers) about {}.\n\n".format(format_subject(subject))
     for i in range(k):
         prompt += format_example(train_df, i)
     return prompt
@@ -46,6 +71,20 @@ def gen_prompt(train_df, subject, k=-1):
 
 @torch.no_grad()
 def eval(args, subject, model, tokenizer, dev_df, test_df):
+    """
+    Evaluates the model on a given subject.
+
+    Args:
+    args (Namespace): Command line arguments.
+    subject (str): The subject to evaluate on.
+    model (AutoModelForCausalLM): The pre-trained model.
+    tokenizer (AutoTokenizer): The tokenizer.
+    dev_df (pd.DataFrame): The development set dataframe.
+    test_df (pd.DataFrame): The test set dataframe.
+
+    Returns:
+    tuple: A tuple containing the correct answers array, accuracy, and probabilities array.
+    """
     cors = []
     all_probs = []
     answers = choices[: test_df.shape[1] - 2]
@@ -103,6 +142,12 @@ def eval(args, subject, model, tokenizer, dev_df, test_df):
 
 
 def main(args):
+    """
+    Main function to run the evaluation script.
+
+    Args:
+    args (Namespace): Command line arguments.
+    """
     model = AutoModelForCausalLM.from_pretrained(
         args.model,
         torch_dtype=torch.float16,
@@ -193,4 +238,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     main(args)
     
+# Example command to run the script: 
 # python3 evaluate_hf.py -m /workspace/models/llama2-7b-hf
