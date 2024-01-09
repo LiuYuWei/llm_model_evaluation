@@ -1,4 +1,4 @@
-# llm_model_evaluation Repo
+# llm_model_evaluation
 
 ## Description
 Use python script to do LLM Model Evaluation.
