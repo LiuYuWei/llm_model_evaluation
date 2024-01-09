@@ -1,10 +1,16 @@
-# llm_evaluation_tmmluplus
+# llm_model_evaluation Repo
 
 ## Description
-LLM Model Evaluation for tmmluplus datasets
+Use python script to do LLM Model Evaluation.
 
-## Dataset
-tmmluplus dataset
+## Support Dataset
+
+### I. mmlu dataset
+
+- Introduction from paper with code:
+[Paper-with-code](https://paperswithcode.com/dataset/mmlu)
+
+### II. tmmluplus dataset
 
 - Introduction:
 [Medium Article](https://medium.com/infuseai/tmmluplus-dataset-brief-introduction-ecfd00297838)
@@ -32,4 +38,4 @@ python3 evaluate_hf.py \
 ```
 
 ## The example google colab code
-Link: [Google Colab](https://colab.research.google.com/github/LiuYuWei/llm_evaluation_tmmluplus/blob/main/llm_evaluation_tmmluplus_example.ipynb)
+- tmmluplus: [Google Colab - tmmluplus](https://colab.research.google.com/github/LiuYuWei/llm_evaluation_tmmluplus/blob/main/llm_evaluation_tmmluplus_example.ipynb)
