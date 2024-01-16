@@ -9,6 +9,7 @@ import pandas as pd
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+from config.log_config import logging
 from categories.category_tmmluplus import categories_tmmluplus, subcategories_tmmluplus
 from categories.category_mmlu import categories_mmlu, subcategories_mmlu
 
@@ -137,7 +138,7 @@ def eval(args, subject, model, tokenizer, dev_df, test_df):
     cors = np.array(cors)
 
     all_probs = np.array(all_probs)
-    print("Average accuracy {:.3f} - {}".format(acc, subject))
+    logging.info("Average accuracy {:.3f} - {}".format(acc, subject))
 
     return cors, acc, all_probs
 
@@ -149,6 +150,7 @@ def main(args):
     Args:
     args (Namespace): Command line arguments.
     """
+    logging.info("The type of Category: {}".format(args.category_type))
     if args.category_type == "mmlu":
         categories = categories_mmlu
         subcategories = subcategories_mmlu
@@ -156,7 +158,7 @@ def main(args):
         categories = categories_tmmluplus
         subcategories = subcategories_tmmluplus
     else:
-        print("Wrong category type. Please check the content.")
+        logging.error("Wrong category type. Please check the content.")
 
     model = AutoModelForCausalLM.from_pretrained(
         args.model,
@@ -195,7 +197,7 @@ def main(args):
         test_df = pd.read_csv(
             os.path.join(args.data_dir, "test", subject + "_test.csv"), header=None
         )
-        print("Start: {}".format(subject))
+        logging.info("Start: {}".format(subject))
         cors, acc, probs = eval(args, subject, model, tokenizer, dev_df, test_df)
         subcats = subcategories[subject]
         for subcat in subcats:
@@ -220,15 +222,15 @@ def main(args):
     for subcat in subcat_cors:
         subcat_acc = np.mean(np.concatenate(subcat_cors[subcat]))
         results["subcategories"][subcat] = subcat_acc
-        print("Average accuracy {:.3f} - {}".format(subcat_acc, subcat))
+        logging.info("Average accuracy {:.3f} - {}".format(subcat_acc, subcat))
 
     for cat in cat_cors:
         cat_acc = np.mean(np.concatenate(cat_cors[cat]))
         results["categories"][cat] = cat_acc
-        print("Average accuracy {:.3f} - {}".format(cat_acc, cat))
+        logging.info("Average accuracy {:.3f} - {}".format(cat_acc, cat))
     weighted_acc = np.mean(np.concatenate(all_cors))
     results["weighted_accuracy"] = weighted_acc
-    print("Average accuracy: {:.3f}".format(weighted_acc))
+    logging.info("Average accuracy: {:.3f}".format(weighted_acc))
 
     results_file = os.path.join(
         args.save_dir, "accuracies_{}.json".format(args.model.replace("/", "_"))
