@@ -181,7 +181,7 @@ def main(args):
     args (Namespace): Command line arguments.
     """
     start_time = time.time()
-    
+
     categories, subcategories, subcat_cors, cat_cors = verify_categories(args.category_type)
 
     model, tokenizer = initial_model(args)
@@ -208,9 +208,6 @@ def main(args):
             os.path.join(args.data_dir, "test", subject + "_test.csv"), header=None
         )
 
-        # Log that the processing of the current subject has started
-        logging.info("Start the subject: {}".format(subject))
-        
         # Evaluate the model on the current subject's data
         cors, acc, probs, all_times = eval(args, subject, model, tokenizer, dev_df, test_df)
 
@@ -237,6 +234,10 @@ def main(args):
             test_df["{}_choice{}_probs".format(args.model, choice)] = probs[:, j]
         
         test_df["{}_spend_time".format(args.model)] = all_times
+
+        logging.info("Save the testing file into {}".format(os.path.join(
+            args.save_dir, "results_{}".format(args.model.split("/")[-1]), "{}.csv".format(subject)
+        )))
 
         # Save the modified test dataframe to a CSV file
         test_df.to_csv(
