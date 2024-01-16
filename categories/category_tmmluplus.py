@@ -1,4 +1,4 @@
-subcategories = {
+subcategories_tmmluplus = {
     "dentistry": ["health"],
     "traditional_chinese_medicine_clinical_medicine": ["health"],
     "clinical_psychology": ["psychology"],
@@ -69,7 +69,7 @@ subcategories = {
 }
 
 
-categories = {
+categories_tmmluplus = {
     "STEM": [
         "organic_chemistry",
         "advance_chemistry",

@@ -9,7 +9,8 @@ import pandas as pd
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from categories import categories, subcategories
+from .categories.category_tmmluplus import categories_tmmluplus, subcategories_tmmluplus
+from .categories.category_mmlu import categories_mmlu, subcategories_mmlu
 
 choices = ["A", "B", "C", "D"]
 
@@ -148,6 +149,15 @@ def main(args):
     Args:
     args (Namespace): Command line arguments.
     """
+    if args.category_type == "mmlu":
+        categories = categories_tmmluplus
+        subcategories = subcategories_tmmluplus
+    elif args.category_type == "tmmluplus":
+        categories = categories_mmlu
+        subcategories = subcategories_mmlu
+    else:
+        print("Wrong category type. Please check the content.")
+
     model = AutoModelForCausalLM.from_pretrained(
         args.model,
         torch_dtype=torch.float16,
@@ -185,7 +195,7 @@ def main(args):
         test_df = pd.read_csv(
             os.path.join(args.data_dir, "test", subject + "_test.csv"), header=None
         )
-
+        print("Start: {}".format(subject))
         cors, acc, probs = eval(args, subject, model, tokenizer, dev_df, test_df)
         subcats = subcategories[subject]
         for subcat in subcats:
@@ -231,6 +241,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--category_type", "-c", type=str, default="tmmluplus")
     parser.add_argument("--ntrain", "-k", type=int, default=5)
     parser.add_argument("--data_dir", "-d", type=str, default="data")
     parser.add_argument("--save_dir", "-s", type=str, default="results")
