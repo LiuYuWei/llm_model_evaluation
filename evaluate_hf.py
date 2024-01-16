@@ -9,8 +9,8 @@ import pandas as pd
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from .categories.category_tmmluplus import categories_tmmluplus, subcategories_tmmluplus
-from .categories.category_mmlu import categories_mmlu, subcategories_mmlu
+from llm_model_evaluation.categories.category_tmmluplus import categories_tmmluplus, subcategories_tmmluplus
+from llm_model_evaluation.categories.category_mmlu import categories_mmlu, subcategories_mmlu
 
 choices = ["A", "B", "C", "D"]
 
