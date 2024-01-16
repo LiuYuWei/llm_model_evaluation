@@ -150,11 +150,11 @@ def main(args):
     args (Namespace): Command line arguments.
     """
     if args.category_type == "mmlu":
-        categories = categories_tmmluplus
-        subcategories = subcategories_tmmluplus
-    elif args.category_type == "tmmluplus":
         categories = categories_mmlu
         subcategories = subcategories_mmlu
+    elif args.category_type == "tmmluplus":
+        categories = categories_tmmluplus
+        subcategories = subcategories_tmmluplus
     else:
         print("Wrong category type. Please check the content.")
 
