@@ -180,6 +180,8 @@ def main(args):
     Args:
     args (Namespace): Command line arguments.
     """
+    start_time = time.time()
+    
     categories, subcategories, subcat_cors, cat_cors = verify_categories(args.category_type)
 
     model, tokenizer = initial_model(args)
