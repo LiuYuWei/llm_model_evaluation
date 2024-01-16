@@ -42,7 +42,7 @@ python3 evaluate_hf.py \
 [Google Colab - mmlu](https://colab.research.google.com/github/LiuYuWei/llm_model_evaluation/blob/main/llm_evaluation_mmlu.ipynb)
 
 - tmmluplus dataset: 
-[Google Colab - tmmluplus](https://colab.research.google.com/github/LiuYuWei/llm_model_evaluation/blob/main/llm_evaluation_tmmluplus_example.ipynb)
+[Google Colab - tmmluplus](https://colab.research.google.com/github/LiuYuWei/llm_model_evaluation/blob/main/llm_evaluation_tmmluplus.ipynb)
 
 ## Evaluation Result
 
