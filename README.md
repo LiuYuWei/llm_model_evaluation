@@ -39,10 +39,11 @@ python3 evaluate_hf.py \
 
 ## The example google colab code
 - mmlu dataset:
-[Google Colab - mmlu](https://colab.research.google.com/github/LiuYuWei/llm_model_evaluation/blob/main/llm_evaluation_mmlu.ipynb)
+1. [Google Colab - mmlu](https://colab.research.google.com/github/LiuYuWei/llm_model_evaluation/blob/main/llm_evaluation_mmlu.ipynb)
+2. [Google Colab - mmlu in phi-2 model](https://colab.research.google.com/github/LiuYuWei/llm_model_evaluation/blob/main/llm_evaluation_mmlu.ipynb) [Colab free tier can use this Google Colab example]
 
 - tmmluplus dataset: 
-[Google Colab - tmmluplus](https://colab.research.google.com/github/LiuYuWei/llm_model_evaluation/blob/main/llm_evaluation_tmmluplus.ipynb)
+1. [Google Colab - tmmluplus](https://colab.research.google.com/github/LiuYuWei/llm_model_evaluation/blob/main/llm_evaluation_tmmluplus.ipynb)
 
 ## Evaluation Result
 
