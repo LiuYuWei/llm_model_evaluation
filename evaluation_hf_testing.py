@@ -170,7 +170,7 @@ def eval(args, subject, model, tokenizer, dev_df, test_df):
     all_probs = np.array(all_probs)
     logging.info("Average accuracy {:.3f} - {}".format(acc, subject))
 
-    return cors, all_probs, all_times
+    return cors, answers, all_probs, all_times
 
 def main(args):
     """
@@ -205,9 +205,10 @@ def main(args):
         )
 
         # Evaluate the model on the current subject's data
-        cors, probs, all_times = eval(args, subject, model, tokenizer, dev_df, test_df)
+        cors, answers, probs, all_times = eval(args, subject, model, tokenizer, dev_df, test_df)
 
         # Process and save the results
+        test_df["{}_answer".format(args.model)] = answers
         test_df["{}_correct".format(args.model)] = cors
         for j in range(probs.shape[1]):
             choice = choices[j]
@@ -239,6 +240,3 @@ if __name__ == "__main__":
     parser.add_argument("--model", "-m", type=str)
     args = parser.parse_args()
     main(args)
-    
-# Example command to run the script: 
-# python3 evaluation_testing.py -m /workspace/models/llama2-7b-hf
