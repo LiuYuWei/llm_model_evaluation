@@ -170,8 +170,7 @@ def eval(args, subject, model, tokenizer, dev_df, test_df):
     all_probs = np.array(all_probs)
     logging.info("Average accuracy {:.3f} - {}".format(acc, subject))
 
-    return cors, acc, all_probs, all_times
-
+    return cors, all_probs, all_times
 
 def main(args):
     """
@@ -181,65 +180,39 @@ def main(args):
     args (Namespace): Command line arguments.
     """
     start_time = time.time()
+    old_checkpoint_time = start_time
+    logging.info("<Spend Time> Starting time: {}".format(start_time))
 
-    categories, subcategories, subcat_cors, cat_cors = verify_categories(args.category_type)
+    # Initialize the model and tokenizer
+    model, tokenizer = initial_model(args)  
 
-    model, tokenizer = initial_model(args)
+    # Retrieve list of subjects
+    subjects = get_subject(args.data_dir)  
 
-    subjects = get_subject(args.data_dir)
-
-    create_result_folder(args)
-
-    # Initialize an empty list to store correlation scores for all subjects
-    all_cors = []
+    # Create folder for saving results
+    create_result_folder(args)  
 
     # Loop through each subject in the 'subjects' list
     for subject in subjects:
-        # Log the start of processing for the current subject
         logging.info("Start the subject: {}".format(subject))
 
-        # Read the development dataset for the current subject from CSV file
+        # Read development and test datasets
         dev_df = pd.read_csv(
             os.path.join(args.data_dir, "dev", subject + "_dev.csv"), header=None
-        )[: args.ntrain]  # Limit the number of training samples if specified
-
-        # Read the test dataset for the current subject from CSV file
+        )[: args.ntrain]
         test_df = pd.read_csv(
             os.path.join(args.data_dir, "test", subject + "_test.csv"), header=None
         )
 
         # Evaluate the model on the current subject's data
-        cors, acc, probs, all_times = eval(args, subject, model, tokenizer, dev_df, test_df)
+        cors, probs, all_times = eval(args, subject, model, tokenizer, dev_df, test_df)
 
-        # Loop through subcategories related to the current subject
-        subcats = subcategories[subject]
-        for subcat in subcats:
-            # Append the correlation scores to the respective subcategory list
-            subcat_cors[subcat].append(cors)
-
-            # Loop through main categories and assign scores to relevant categories
-            for key in categories.keys():
-                if subcat in categories[key]:
-                    cat_cors[key].append(cors)
-
-        # Append the overall correlation scores for the subject to the all_cors list
-        all_cors.append(cors)
-
-        # Add a column to the test dataframe indicating if the model's predictions were correct
+        # Process and save the results
         test_df["{}_correct".format(args.model)] = cors
-
-        # For each choice, add a column with the probabilities of that choice being correct
         for j in range(probs.shape[1]):
             choice = choices[j]
             test_df["{}_choice{}_probs".format(args.model, choice)] = probs[:, j]
-        
         test_df["{}_spend_time".format(args.model)] = all_times
-
-        logging.info("Save the testing file into {}".format(os.path.join(
-            args.save_dir, "results_{}".format(args.model.split("/")[-1]), "{}.csv".format(subject)
-        )))
-
-        # Save the modified test dataframe to a CSV file
         test_df.to_csv(
             os.path.join(
                 args.save_dir, "results_{}".format(args.model.split("/")[-1]), "{}.csv".format(subject)
@@ -247,28 +220,14 @@ def main(args):
             index=None,
         )
 
+        # Logging the time spent on the current subject
+        checkpoint_time = time.time()
+        logging.info("<Spend Time> In {}, spend time: {}.".format(subject, checkpoint_time - old_checkpoint_time))
+        old_checkpoint_time = checkpoint_time
 
-    results = {"subcategories": {}, "categories": {}}
-    for subcat in subcat_cors:
-        subcat_acc = np.mean(np.concatenate(subcat_cors[subcat]))
-        results["subcategories"][subcat] = subcat_acc
-        logging.info("Average accuracy {:.3f} - {}".format(subcat_acc, subcat))
-
-    for cat in cat_cors:
-        cat_acc = np.mean(np.concatenate(cat_cors[cat]))
-        results["categories"][cat] = cat_acc
-        logging.info("Average accuracy {:.3f} - {}".format(cat_acc, cat))
-    weighted_acc = np.mean(np.concatenate(all_cors))
-    results["weighted_accuracy"] = weighted_acc
-    logging.info("Average accuracy: {:.3f}".format(weighted_acc))
-
-    results_file = os.path.join(
-        args.save_dir, "accuracies_{}.json".format(args.model.replace("/", "_"))
-    )
+    # Logging the total time spent
     end_time = time.time()
-    results["cost_time"] = end_time - start_time
-    with open(results_file, "w") as f:
-        f.write(json.dumps(results, indent=4))
+    logging.info("<Spend Time> Total Spending Time: {}.".format(start_time, end_time, end_time-start_time))
 
 
 if __name__ == "__main__":
