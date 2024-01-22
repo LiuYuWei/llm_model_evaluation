@@ -118,6 +118,7 @@ def eval(args, subject, model, tokenizer, dev_df, test_df):
     all_probs = []
     answers = choices[: test_df.shape[1] - 2]
     all_times = []
+    all_preds = []
 
     for i in range(test_df.shape[0]):
         start_time = time.time()
@@ -161,6 +162,7 @@ def eval(args, subject, model, tokenizer, dev_df, test_df):
 
         cor = pred == label
         cors.append(cor)
+        all_preds.append(pred)
         all_probs.append(probs)
         all_times.append(time.time() - start_time)
 
@@ -170,7 +172,7 @@ def eval(args, subject, model, tokenizer, dev_df, test_df):
     all_probs = np.array(all_probs)
     logging.info("Average accuracy {:.3f} - {}".format(acc, subject))
 
-    return cors, answers, all_probs, all_times
+    return cors, all_probs, all_preds, all_times
 
 def main(args):
     """
@@ -179,6 +181,7 @@ def main(args):
     Args:
     args (Namespace): Command line arguments.
     """
+    logging.info("===== [Start] Evaluation by huggingface model ===== ")
     start_time = time.time()
     old_checkpoint_time = start_time
     logging.info("<Spend Time> Starting time: {}".format(start_time))
@@ -205,10 +208,10 @@ def main(args):
         )
 
         # Evaluate the model on the current subject's data
-        cors, answers, probs, all_times = eval(args, subject, model, tokenizer, dev_df, test_df)
+        cors, probs, all_preds, all_times = eval(args, subject, model, tokenizer, dev_df, test_df)
 
         # Process and save the results
-        test_df["{}_answer".format(args.model)] = answers
+        test_df["{}_prediction".format(args.model)] = all_preds
         test_df["{}_correct".format(args.model)] = cors
         for j in range(probs.shape[1]):
             choice = choices[j]
@@ -229,7 +232,7 @@ def main(args):
     # Logging the total time spent
     end_time = time.time()
     logging.info("<Spend Time> Total Spending Time: {}.".format(start_time, end_time, end_time-start_time))
-
+    logging.info("===== [Finish] Evaluation by huggingface model ===== ")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
