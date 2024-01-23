@@ -3,7 +3,8 @@ import os
 import pandas as pd
 import json
 
-from categories.category_mmlu import categories_mmlu, subcategories_mmlu
+from categories import verify_categories
+# from categories.category_mmlu import categories_mmlu, subcategories_mmlu
 
 def process_csv_file(file_path, model_name):
     '''
@@ -21,6 +22,7 @@ def find_main_category(subcategory):
     return 'Unknown'
 
 def main(args):
+    _, subcategories_mmlu, _ , _ = verify_categories(args.category_type)
     model_name = args.model
     results_dir = args.save_dir
     results = {
