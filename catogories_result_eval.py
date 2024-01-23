@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import json
 
+from config.log_config import logging
 from categories import verify_categories
 # from categories.category_mmlu import categories_mmlu, subcategories_mmlu
 
