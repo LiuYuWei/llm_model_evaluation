@@ -29,12 +29,20 @@ git clone https://huggingface.co/mistralai/Mistral-7B-v0.1
 
 - Step 2: Please arrange the dataset from tmmluplus data folder to data_arrange folder.
 
-- Step 3: Please run the following code:
+- Step 3: Please run the following code to predict the result:
 ```bash
-python3 evaluate_hf.py \
+python3 evaluation_hf_testing.py \
     --model ./models/llama2-7b-hf \
     --data_dir ./llm_evaluation_tmmluplus/data_arrange/ \
     --save_dir ./llm_evaluation_tmmluplus/results/
+```
+
+- Step 4: Please run the evaluation code to get the output json file.
+```
+!python /content/llm_model_evaluation/catogories_result_eval.py \
+    --catogory "mmlu" \
+    --model ./models/llama2-7b-hf \
+    --save_dir "./results/results_llama2-7b-hf"
 ```
 
 ## The example google colab code
