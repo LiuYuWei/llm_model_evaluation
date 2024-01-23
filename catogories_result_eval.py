@@ -23,6 +23,8 @@ def find_main_category(subcategory, categories_mmlu):
     return 'Unknown'
 
 def main(args):
+    logging.info("===== Start the evaluate the category. ======")
+
     categories_mmlu, subcategories_mmlu, _ , _ = verify_categories(args.category_type)
     model_name = args.model
     results_dir = args.save_dir
@@ -70,6 +72,7 @@ def main(args):
     with open(output_file, 'w') as f:
         json.dump(results, f, indent=4)
 
+    logging.info("===== Finish the evaluation, please check the result json file. ======")
     return output_file
 
 if __name__ == "__main__":
