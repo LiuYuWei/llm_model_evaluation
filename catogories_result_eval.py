@@ -20,7 +20,7 @@ def process_csv_file(file_path, category, model_name):
     }
 
 def main(args):
-    model_name = args.model.replace('/', '_').replace('.', '_')
+    model_name = args.model
     results = {
         "subcategories": {},
         "categories": {},
