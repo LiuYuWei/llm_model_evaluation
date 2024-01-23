@@ -3,24 +3,26 @@ import os
 import pandas as pd
 import json
 
-# Load the categorization logic from a separate file
 from categories.category_mmlu import categories_mmlu, subcategories_mmlu
 
-def process_csv_file(file_path, category, model_name):
-    """
+def process_csv_file(file_path, model_name):
+    '''
     Process a single CSV file and return the calculated statistics.
-    """
+    '''
     csv_data = pd.read_csv(file_path)
     correct_column = csv_data[f'{model_name}_correct']
     time_spent_column = csv_data[f'{model_name}_spend_time']
-    
-    return {
-        "accuracy": correct_column.mean(),
-        "total_time_spent": time_spent_column.sum()
-    }
+    return correct_column.mean(), time_spent_column.sum()
+
+def find_main_category(subcategory):
+    for main_category, subcats in categories_mmlu.items():
+        if subcategory in subcats:
+            return main_category
+    return 'Unknown'
 
 def main(args):
     model_name = args.model
+    results_dir = args.save_dir
     results = {
         "subcategories": {},
         "categories": {},
@@ -28,25 +30,44 @@ def main(args):
         "cost_time": 0
     }
     total_questions = 0
+    total_accuracy = 0
 
-    for file_name in os.listdir(args.save_dir):
+    for file_name in os.listdir(results_dir):
         if file_name.endswith('.csv'):
-            file_path = os.path.join(args.save_dir, file_name)
-            category = subcategories_mmlu.get(file_name.split('.')[0], 'other')
-            file_results = process_csv_file(file_path, category, model_name)
+            file_path = os.path.join(results_dir, file_name)
+            subcategory_key = file_name.replace('.csv', '')
+            if subcategory_key not in subcategories_mmlu:
+                continue  # Skip files without a corresponding key in subcategories_mmlu
+            accuracy, time_spent = process_csv_file(file_path, model_name)
+            
+            # Aggregating results for subcategories
+            broad_category = subcategories_mmlu[subcategory_key][0]
 
-            results["subcategories"][category] = file_results["accuracy"]
-            results["cost_time"] += file_results["total_time_spent"]
+            results["subcategories"].setdefault(broad_category, []).append(accuracy)
+
+            # Mapping broad category to main category
+            main_category = find_main_category(broad_category)
+
+            results["categories"].setdefault(main_category, []).append(accuracy)
+
             total_questions += len(pd.read_csv(file_path))
+            total_accuracy += accuracy * len(pd.read_csv(file_path))
+            results["cost_time"] += time_spent
 
-    # Calculate weighted accuracy
-    results["weighted_accuracy"] = sum(
-        [results["subcategories"][cat] * len(pd.read_csv(os.path.join(args.save_dir, f"{cat}.csv")))
-         for cat in results["subcategories"]]) / total_questions
+    # Calculating averages for subcategories and categories
+    for subcategory, accuracies in results["subcategories"].items():
+        results["subcategories"][subcategory] = sum(accuracies) / len(accuracies)
+    for category, accuracies in results["categories"].items():
+        results["categories"][category] = sum(accuracies) / len(accuracies)
 
-    # Save the results to a JSON file
-    with open(os.path.join(args.save_dir, f"{model_name}_results.json"), 'w') as f:
+    results["weighted_accuracy"] = total_accuracy / total_questions
+
+    # Saving the results to a JSON file
+    output_file = os.path.join(results_dir, 'processed_results.json')
+    with open(output_file, 'w') as f:
         json.dump(results, f, indent=4)
+
+    return output_file
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Model Evaluation Script")
