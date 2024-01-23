@@ -15,14 +15,14 @@ def process_csv_file(file_path, model_name):
     time_spent_column = csv_data[f'{model_name}_spend_time']
     return correct_column.mean(), time_spent_column.sum()
 
-def find_main_category(subcategory):
+def find_main_category(subcategory, categories_mmlu):
     for main_category, subcats in categories_mmlu.items():
         if subcategory in subcats:
             return main_category
     return 'Unknown'
 
 def main(args):
-    _, subcategories_mmlu, _ , _ = verify_categories(args.category_type)
+    categories_mmlu, subcategories_mmlu, _ , _ = verify_categories(args.category_type)
     model_name = args.model
     results_dir = args.save_dir
     results = {
@@ -48,7 +48,7 @@ def main(args):
             results["subcategories"].setdefault(broad_category, []).append(accuracy)
 
             # Mapping broad category to main category
-            main_category = find_main_category(broad_category)
+            main_category = find_main_category(broad_category, categories_mmlu)
 
             results["categories"].setdefault(main_category, []).append(accuracy)
 
